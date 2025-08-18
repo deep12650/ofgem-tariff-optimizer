@@ -1,0 +1,27 @@
+{
+  "name": "ofgem-tariff-optimizer",
+  "version": "0.1.0",
+  "description": "UK Ofgem-style tariff optimiser for half-hourly smart meter data. Compare flat, Economy 7, and Agile tariffs and get cheapest schedules for appliances.",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "ofgem-compare": "bin/compare.js"
+  },
+  "keywords": [
+    "uk",
+    "energy",
+    "tariff",
+    "octopus",
+    "ofgem",
+    "economy7",
+    "agile",
+    "smart-meter",
+    "halfhourly",
+    "optimizer"
+  ],
+  "author": "You",
+  "license": "MIT",
+  "scripts": {
+    "demo": "node bin/compare.js examples/octopus_sample.csv"
+  }
+}
