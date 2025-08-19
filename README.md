@@ -1,6 +1,6 @@
 # ofgem-tariff-optimizer
 
-[![CI](https://github.com/<you>/ofgem-tariff-optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/<you>/ofgem-tariff-optimizer/actions/workflows/ci.yml)
+[![CI](https://github.com/deep12650/ofgem-tariff-optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/deep12650/ofgem-tariff-optimizer/actions/workflows/ci.yml)
 
 
 Open-source JS library to **optimise UK electricity tariffs** from half-hourly smart meter data.
