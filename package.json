@@ -21,7 +21,28 @@
   ],
   "author": "You",
   "license": "MIT",
+  "devDependencies": {
+    "c8": "^9.1.0"
+  },
   "scripts": {
-    "demo": "node bin/compare.js examples/octopus_sample.csv"
+    "test": "node --test",
+    "coverage": "c8 --reporter=text --reporter=lcov -- node --test",
+    "coverage:html": "c8 --reporter=html -- node --test",
+    "coverage:check": "c8 --check-coverage --branches=80 --functions=80 --lines=80 --statements=80 -- node --test"
+  },
+  "c8": {
+    "exclude": [
+      "test/**",
+      "examples/**",
+      "bin/**",
+      "coverage/**",
+      "**/*.test.js",
+      "**/*.spec.js"
+    ],
+    "reporter": [
+      "text",
+      "lcov"
+    ],
+    "all": true
   }
 }

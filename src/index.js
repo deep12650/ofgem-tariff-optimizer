@@ -8,7 +8,7 @@
  * @typedef {FlatTariff|Economy7Tariff|AgileTariff} Tariff
  */
 
-export { parseOctopusCSV } from "./parsers/octopus.js";
+export { parseSmartMeterCSV, parseOctopusCSV, parseBritishGasCSV, parseEDFCSV, parseEONNextCSV, parseOVOCSV, parseShellCSV } from "./parsers/index.js";
 
 const DEFAULT_TZ = 'Europe/London';
 

@@ -1,35 +1,44 @@
-// Parse a typical Octopus (and similar) half-hourly CSV export.
-// Accepts header lines and columns containing timestamp + kWh.
-// Tries common column names; ignores blank/invalid rows.
-// Output: Array<{ start: ISO, end: ISO, kWh: number }>
+// Octopus-style CSV (or similar) — tolerant to column names
+import { splitCSV, buildIndex, headerMatches } from "./helpers.js";
 
 /**
  * @param {string} csv
- * @returns {{start:string,end:string,kWh:number}[]}
+ * @param {{detectOnly?:boolean}} opts
  */
-export function parseOctopusCSV(csv) {
-  const lines = csv.split(/\r?\n/).filter(Boolean);
+export function parseOctopusCSV(csv, opts={}) {
+  const lines = csv.split(/\r?\n/).filter(l => l.trim().length);
   if (!lines.length) return [];
-  // detect header
-  const header = lines[0].split(',').map(s => s.trim().toLowerCase());
-  const hasHeader = header.some(h => /start|interval|from|kwh|consumption/.test(h));
-  const rows = hasHeader ? lines.slice(1) : lines;
-  const cols = hasHeader ? header : header.map((_,i)=> String(i));
 
-  // candidate column indexes
-  const idx = {
-    start: cols.findIndex(c => /(start|from|interval)/.test(c)),
-    end:   cols.findIndex(c => /(end|to)/.test(c)),
-    kwh:   cols.findIndex(c => /(kwh|consumption|energy)/.test(c))
+  const header = splitCSV(lines[0]);
+  const headerLower = header.map(h => h.toLowerCase());
+
+  const signature = {
+    start: [/(^| )interval start\b|^start|from/i],
+    end: [/(^| )interval end\b|^end|to/i],
+    kwh: [/kwh|consumption|energy/i],
   };
+  const matched = headerMatches(headerLower, {
+    start: [/interval start|from|start/],
+    kwh: [/kwh|consumption|energy/],
+    end: [/interval end|to|end/],
+  });
 
-  return rows.map(line => line.split(',')).map(parts => {
-    const start = parts[idx.start]?.trim() || parts[0]?.trim();
-    const end   = idx.end>=0 ? parts[idx.end]?.trim() : null;
-    const kWh   = Number(parts[idx.kwh>=0?idx.kwh:1]);
+  if (opts.detectOnly) return matched ? { __DETECTED__: true } : null;
+  const rows = header.some(h => /start|interval|from|kwh|consumption|energy|end|to/i.test(h)) ? lines.slice(1) : lines;
+
+  const idx = buildIndex(headerLower, {
+    start: [/interval start|from|start/],
+    end: [/interval end|to|end/],
+    kwh: [/kwh|consumption|energy/],
+  });
+
+  return rows.map(line => splitCSV(line)).map(parts => {
+    const start = parts[idx.start >= 0 ? idx.start : 0];
+    const end = parts[idx.end >= 0 ? idx.end : 1];
+    const kWh = Number(parts[idx.kwh >= 0 ? idx.kwh : 2]);
     if (!start || !Number.isFinite(kWh)) return null;
     const startISO = new Date(start).toISOString();
-    let endISO = end ? new Date(end).toISOString() : new Date(new Date(start).getTime() + 30*60000).toISOString();
+    const endISO = end ? new Date(end).toISOString() : new Date(new Date(start).getTime() + 30*60000).toISOString();
     return { start: startISO, end: endISO, kWh };
   }).filter(Boolean);
 }
